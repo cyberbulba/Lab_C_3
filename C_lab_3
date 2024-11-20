@@ -1,0 +1,137 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+
+struct list
+{
+	int inf;
+	struct list* next;
+};
+
+//ввод списка
+struct list* input_list(struct list* start)
+{
+	struct list* cur, * end;
+	cur = end = NULL;
+	int ind;
+	char buf;
+
+	while (1)
+	{
+		cur = (struct list*)malloc(sizeof(struct list));
+		cur->next = NULL;
+		ind = scanf("%d", &cur->inf);
+		if (ind == 0)
+		{
+			return NULL;
+		}
+		if (start == NULL)
+		{
+			start = cur;
+			end = cur;
+		}
+		else
+		{
+			end->next = cur;
+			end = cur;
+		}
+		scanf("%c", &buf);
+		if (buf == '.')
+			break;
+	}
+	return start;
+}
+
+//очистка памяти
+void clear_memory(struct list** start)
+{
+	struct list* cur = *start;
+	while (cur != NULL)
+	{
+		*start = cur->next;
+		free(cur);
+		cur = *start;
+	}
+	*start = NULL;
+	return;
+}
+
+//удаление элементов
+void remove_elements(struct list** start, int a, int b)
+{
+	struct list* cur, * last;
+	cur = last = *start;
+	while (cur != NULL)
+	{
+		if (cur->inf >= a && cur->inf <= b)
+		{
+			if (cur == *start)         //если элемент первый
+			{
+				last = (*start)->next;
+				free(*start);           //переносим первый на второй
+				*start = last;		   //переносим начальный элемент
+				cur = last;            //делаем их одинаковыми
+			}
+
+			else if (cur->next == NULL) //если последний элемент
+			{
+				last->next = NULL;      //ставим указатель на предыдущий на 0
+				free(cur);
+				break;
+			}
+
+			else                        //случай, когда не начало и не конец
+			{
+				last->next = cur->next; //переводим элемент через индекс вперед
+				free(cur);
+				cur = last->next;		//перемещаем текущий элемент
+			}
+		}
+		else
+		{
+			last = cur;
+			cur = cur->next;
+		}
+									   //перетаскиваем предыдущий элемент
+	}
+	return;
+}
+
+void print_list(struct list** start)
+{
+	struct list* cur = *start;
+	for (cur = *start;cur != NULL;cur = cur->next)
+	{
+		printf("%d ", cur->inf);
+	}
+	return;
+}
+
+int main()
+{
+	int a, b;
+	struct list* start, *start_new;
+	start = NULL;
+	start = input_list(start);
+
+	if (start == NULL)
+	{
+		printf("NULL");
+		return 0;
+	}
+
+	scanf("%d", &a);
+	scanf("%d", &b);
+
+	remove_elements(&start, a, b);
+
+	if (start == NULL)
+	{
+		printf("NULL");
+		return 0;
+	}
+
+	print_list(&start);
+	clear_memory(&start);
+	return 0;
+}
