@@ -57,42 +57,63 @@ void clear_memory(struct list** start)
 }
 
 //удаление элементов
-void remove_elements(struct list** start, int a, int b)
+void remove_elements_from_a_to_b_to_new_struct(struct list** start, struct list** start_new, int a, int b)
 {
 	struct list* cur, * last;
+	struct list *end_new;
 	cur = last = *start;
+	end_new = *start_new;
 	while (cur != NULL)
 	{
 		if (cur->inf >= a && cur->inf <= b)
 		{
-			if (cur == *start)         //если элемент первый
+			if (cur == *start)         //если элемент который надо переместить стоит на первом месте
 			{
-				last = (*start)->next;
-				free(*start);           //переносим первый на второй
-				*start = last;		   //переносим начальный элемент
-				cur = last;            //делаем их одинаковыми
-			}
+				if (*start_new == NULL)      //если до этого в новом списке не было элементов 
+				{
+					*start_new = *start;     //указатель на начало нвого списка
+					end_new = *start;		 //указатель на конец нового списка
+					*start = (*start)->next; //передвигаем начало старого списка
+					last = cur;				 //указатель на предыдущий ставим на текущий
+					cur = cur->next;		 //передвигаем текущий
+					end_new->next = NULL;    //зануляем последний элемент нового списка
+				}
+				else                        //если до этого в списке были элементы
+				{
+					end_new->next = *start;  //делаем элемент концом нового списка
+					end_new = *start;        //указатель на конец нового списка
+					*start = (*start)->next; //передвигаем начало старого списка
+					last = cur;              //указатель на предыдущий ставим на текущий
+					cur = cur->next;         //передвигаем текущий
+					end_new->next = NULL;    //зануляем последний элемент нового списка
 
-			else if (cur->next == NULL) //если последний элемент
-			{
-				last->next = NULL;      //ставим указатель на предыдущий на 0
-				free(cur);
-				break;
+				}
 			}
-
-			else                        //случай, когда не начало и не конец
+			else                       //если элемент который надо переместить стоит в середине или в конце
 			{
-				last->next = cur->next; //переводим элемент через индекс вперед
-				free(cur);
-				cur = last->next;		//перемещаем текущий элемент
+				if (*start_new == NULL) //если в новом списке ещё нет
+				{
+					*start_new = cur;   //текущий делаем первым во втором списке
+					end_new = cur;      //текущий делаем последним во втором списке
+					last->next = cur->next; //переставляем указатель через элемент который надо поместить в новый список
+					cur = cur->next; //двигаем текущий
+					end_new->next = NULL; //зануляем последний элемент нового списка
+				}
+				else                        //если элементы были
+				{
+					end_new->next = cur; //делаем текущий концом нового списка
+					end_new = cur; //текущий делаем последним во втором списке
+					last->next = cur->next; //переставляем указатель через элемент который надо поместить в новый список
+					cur = cur->next; //двигаем текущий
+					end_new->next = NULL; //зануляем последний элемент нового списка
+				}
 			}
 		}
 		else
 		{
-			last = cur;
-			cur = cur->next;
-		}
-									   //перетаскиваем предыдущий элемент
+			last = cur; //двигаем предыдущий
+			cur = cur->next; //двигаем текущий
+		}						   
 	}
 	return;
 }
@@ -111,7 +132,9 @@ int main()
 {
 	int a, b;
 	struct list* start, *start_new;
-	start = NULL;
+	start = start_new = NULL;
+	
+	printf("Input start list:\n");
 	start = input_list(start);
 
 	if (start == NULL)
@@ -120,10 +143,13 @@ int main()
 		return 0;
 	}
 
+	printf("Input A:\n");
 	scanf("%d", &a);
+	
+	printf("Input B:\n");
 	scanf("%d", &b);
 
-	remove_elements(&start, a, b);
+	remove_elements_from_a_to_b_to_new_struct(&start, &start_new, a, b);
 
 	if (start == NULL)
 	{
@@ -131,7 +157,18 @@ int main()
 		return 0;
 	}
 
+	printf("Old list:\n");
 	print_list(&start);
+	
+	if (start_new == NULL)
+	{
+		printf("New list is NULL.");
+		return 0;
+	}
+	
+	printf("\nNew list:\n");
+	print_list(&start_new);
 	clear_memory(&start);
+
 	return 0;
 }
