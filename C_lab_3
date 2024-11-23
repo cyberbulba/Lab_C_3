@@ -8,6 +8,26 @@ struct list
 	struct list* next;
 };
 
+//функция проверки на ввод пользователем числа (для количества рядов и строк)
+int fool_check()
+{
+	int num, x;
+	char buf;
+	while (1)
+	{
+		x = scanf("%d", &num);
+		if (x)
+		{
+			return num;
+		}
+		else
+		{
+			scanf("%c", &buf);
+			printf("Input 'int', please.\n");
+		}
+	}
+}
+
 //ввод списка
 struct list* input_list(struct list* start)
 {
@@ -19,10 +39,16 @@ struct list* input_list(struct list* start)
 	while (1)
 	{
 		cur = (struct list*)malloc(sizeof(struct list));
+		if (cur == NULL)
+		{
+			printf("ERROR: no memory.");
+			return NULL;
+		}
 		cur->next = NULL;
 		ind = scanf("%d", &cur->inf);
 		if (ind == 0)
 		{
+			printf("ERROR: List is NULL or elements not 'int'.");
 			return NULL;
 		}
 		if (start == NULL)
@@ -36,8 +62,15 @@ struct list* input_list(struct list* start)
 			end = cur;
 		}
 		scanf("%c", &buf);
+
 		if (buf == '.')
 			break;
+		
+		if (buf != ' ')
+		{
+			printf("ERROR: Wrong inputting symbol.");
+			return NULL;
+		}
 	}
 	return start;
 }
@@ -139,36 +172,42 @@ int main()
 
 	if (start == NULL)
 	{
-		printf("NULL");
 		return 0;
 	}
 
 	printf("Input A:\n");
-	scanf("%d", &a);
+	a = fool_check();
 	
 	printf("Input B:\n");
-	scanf("%d", &b);
+	b = fool_check();
 
+	if (a > b)
+	{
+		printf("ERROR: a must be lower that b or equalent b.");
+		return 0;
+	}
 	remove_elements_from_a_to_b_to_new_struct(&start, &start_new, a, b);
+
+	if (start_new == NULL)
+	{
+		printf("\nNew list is NULL.");
+		return 0;
+	}
 
 	if (start == NULL)
 	{
-		printf("NULL");
-		return 0;
+		printf("Old list is NULL.");
 	}
-
-	printf("Old list:\n");
-	print_list(&start);
-	
-	if (start_new == NULL)
+	else
 	{
-		printf("New list is NULL.");
-		return 0;
+		printf("Old list without numbers from %d to %d:\n", a, b);
+		print_list(&start);
 	}
-	
-	printf("\nNew list:\n");
-	print_list(&start_new);
 	clear_memory(&start);
+	
+	printf("\nNew list with numbers from %d to %d:\n", a, b);
+	print_list(&start_new);
+	clear_memory(&start_new);
 
 	return 0;
 }
