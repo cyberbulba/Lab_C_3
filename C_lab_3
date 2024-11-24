@@ -170,7 +170,7 @@ int main()
 	start = start_new = NULL;
 	
 	//ввод начального списка
-	printf("Input start list:\n");
+	printf("Input start list before '.':\n");
 	start = input_list(start);
 
 	if (start == NULL)
