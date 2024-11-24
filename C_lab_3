@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+//структура связного списка
 struct list
 {
 	int inf;
@@ -114,7 +115,7 @@ void remove_elements_from_a_to_b_to_new_struct(struct list** start, struct list*
 				else                        //если до этого в списке были элементы
 				{
 					end_new->next = *start;  //делаем элемент концом нового списка
-					end_new = *start;        //указатель на конец нового списка
+					end_new = end_new->next; //указатель на конец нового списка
 					*start = (*start)->next; //передвигаем начало старого списка
 					last = cur;              //указатель на предыдущий ставим на текущий
 					cur = cur->next;         //передвигаем текущий
@@ -122,35 +123,36 @@ void remove_elements_from_a_to_b_to_new_struct(struct list** start, struct list*
 
 				}
 			}
-			else                       //если элемент который надо переместить стоит в середине или в конце
+			else							//если элемент который надо переместить стоит в середине или в конце
 			{
-				if (*start_new == NULL) //если в новом списке ещё нет
+				if (*start_new == NULL)		//если в новом списке ещё нет
 				{
-					*start_new = cur;   //текущий делаем первым во втором списке
-					end_new = cur;      //текущий делаем последним во втором списке
+					*start_new = cur;		//текущий делаем первым во втором списке
+					end_new = cur;			//текущий делаем последним во втором списке
 					last->next = cur->next; //переставляем указатель через элемент который надо поместить в новый список
-					cur = cur->next; //двигаем текущий
-					end_new->next = NULL; //зануляем последний элемент нового списка
+					cur = cur->next;		//двигаем текущий
+					end_new->next = NULL;	//зануляем последний элемент нового списка
 				}
 				else                        //если элементы были
 				{
-					end_new->next = cur; //делаем текущий концом нового списка
-					end_new = cur; //текущий делаем последним во втором списке
+					end_new->next = cur;	//делаем текущий концом нового списка
+					end_new = end_new->next;//текущий делаем последним во втором списке
 					last->next = cur->next; //переставляем указатель через элемент который надо поместить в новый список
-					cur = cur->next; //двигаем текущий
-					end_new->next = NULL; //зануляем последний элемент нового списка
+					cur = cur->next;		//двигаем текущий
+					end_new->next = NULL;	//зануляем последний элемент нового списка
 				}
 			}
 		}
 		else
 		{
-			last = cur; //двигаем предыдущий
-			cur = cur->next; //двигаем текущий
+			last = cur;						//двигаем предыдущий
+			cur = cur->next;				//двигаем текущий
 		}						   
 	}
 	return;
 }
 
+//функция для вывода списка
 void print_list(struct list** start)
 {
 	struct list* cur = *start;
@@ -167,6 +169,7 @@ int main()
 	struct list* start, *start_new;
 	start = start_new = NULL;
 	
+	//ввод начального списка
 	printf("Input start list:\n");
 	start = input_list(start);
 
@@ -175,6 +178,7 @@ int main()
 		return 0;
 	}
 
+	//ввод границ с проверкой
 	printf("Input A:\n");
 	a = fool_check();
 	
@@ -186,14 +190,20 @@ int main()
 		printf("ERROR: a must be lower that b or equalent b.");
 		return 0;
 	}
+
+	//перестановка необходимых элементов в новый список
 	remove_elements_from_a_to_b_to_new_struct(&start, &start_new, a, b);
 
+	//если новый список пуст, то вывод старого
 	if (start_new == NULL)
 	{
-		printf("\nNew list is NULL.");
+		printf("New list is NULL.");
+		printf("\nOld list without numbers from %d to %d:\n", a, b);
+		print_list(&start);
 		return 0;
 	}
 
+	//проверка пустой ли старый список
 	if (start == NULL)
 	{
 		printf("Old list is NULL.");
@@ -201,12 +211,17 @@ int main()
 	else
 	{
 		printf("Old list without numbers from %d to %d:\n", a, b);
-		print_list(&start);
+		print_list(&start); //вывод старого если не пустой
 	}
+	
+	//очистка памяти старого списка
 	clear_memory(&start);
 	
+	//вывод нового списка
 	printf("\nNew list with numbers from %d to %d:\n", a, b);
 	print_list(&start_new);
+	
+	//очистка памяти нового списка
 	clear_memory(&start_new);
 
 	return 0;
